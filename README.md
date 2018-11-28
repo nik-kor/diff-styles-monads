@@ -70,3 +70,4 @@ info p = Free (Info p return)
 * https://ocharles.org.uk/blog/posts/2016-01-26-transformers-free-monads-mtl-laws.html
 * http://degoes.net/articles/modern-fp
 * https://www.youtube.com/watch?v=gUPuWHAt6SA&t=2191s
+* http://okmij.org/ftp/Computation/free-monad.html

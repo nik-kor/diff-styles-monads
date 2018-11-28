@@ -5,58 +5,29 @@ module Lib where
 
 import           Prelude                 hiding ( take )
 import qualified Data.Map.Strict               as M
-import           Control.Monad.Reader
-import           Control.Monad.State.Lazy
-import           Data.List                      ( intersperse
-                                                , transpose
-                                                , elemIndex
-                                                )
+import           Data.List                      ( transpose )
 import           Data.List.Split                ( chunksOf )
-import           Data.List.Index                ( ifoldr )
-import           Data.Maybe                     ( isJust
-                                                , fromJust
-                                                )
-
--- types and variables
-
-data Player = O | X deriving (Eq, Show)
-
-data GameStatus =
-    Active
-    | Draw
-    | Won { by :: Player } deriving (Eq, Show)
-
-type Cell = Either Position Player
-type Board = [[Cell]]
-type Moves = M.Map Position Player
-
-data Position = One | Two | Three | Four | Five | Six | Seven | Eight | Nine deriving (Eq, Ord)
-allPositions :: [Position]
-allPositions = [One, Two, Three, Four, Five, Six, Seven, Eight, Nine]
-
-
-instance Show Position where
-    show p = case elemIndex p allPositions of
-        Just p' ->
-            show $ p' + 1
-        Nothing ->
-            "Cannot get the value for position"
-
+import           Data.Maybe                     ( isJust )
+import           Common
 
 -- our monad's primitives
 
 class Monad m => TicTacToe m where
     info :: Position -> m (Maybe Player)
-    take :: Position -> m Bool
+    take :: Position -> m Taken
     -- fetch the current player
     who :: m Player
     -- tracking the moves in a game
     moves :: m Moves
 
+class Monad m => Interactions m where
+    showMessage :: String -> m ()
+    getPlayerChoice :: m String
+
 
 -- high-level API
 
-takeIfNotTaken :: TicTacToe m => Position -> m Bool
+takeIfNotTaken :: TicTacToe m => Position -> m Taken
 takeIfNotTaken p = do
     i <- info p
     case i of
@@ -70,6 +41,7 @@ gameStatus b = return $ renderStatus b
     wonBy b =
         let diagonals [[a1, _, b1], [_, c, _], [b2, _, a2]] =
                 [[a1, c, a2], [b1, c, b2]]
+            diagonals _ = error "cannot get diagnonals"
             ds      = diagonals b
             rows    = b
             cols    = transpose b

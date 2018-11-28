@@ -23,7 +23,7 @@ instance TicTacToe MockedIO where
     take p = do
         l <- info p
         case l of
-            Just p' -> return False
+            Just _ -> return False
             Nothing -> do
                 ms <- moves
                 cp <- who
